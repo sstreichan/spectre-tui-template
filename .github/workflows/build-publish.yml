@@ -60,7 +60,7 @@ jobs:
         shell: bash
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: mytui-${{ matrix.runtime }}
           path: mytui-${{ matrix.runtime }}.*
