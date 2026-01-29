@@ -33,21 +33,41 @@ jobs:
       - name: Versionize
         id: versionize
         run: |
-          versionize --changelog-all --exit-insignificant-commits
-          if [ $? -eq 0 ]; then
-            echo "VERSION=$(git describe --tags --abbrev=0 | sed 's/v//')" >> $GITHUB_OUTPUT
+          # Run versionize and capture output
+          versionize --changelog-all || exit_code=$?
+          
+          # Check if versionize succeeded (exit code 0 means version was bumped)
+          if [ -z "$exit_code" ] || [ "$exit_code" -eq 0 ]; then
+            # Get the version from the latest tag
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/v//' || echo "")
+            
+            if [ -n "$VERSION" ]; then
+              echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+              echo "success=true" >> $GITHUB_OUTPUT
+              echo "✅ Version bumped to v$VERSION"
+            else
+              echo "⚠️  No version tag created (no conventional commits found)"
+              echo "success=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "❌ Versionize failed with exit code $exit_code"
+            echo "success=false" >> $GITHUB_OUTPUT
+            exit 1
           fi
-        continue-on-error: true
       
       - name: Push changes
-        if: steps.versionize.outcome == 'success'
-        run: git push --follow-tags origin main
+        if: steps.versionize.outputs.success == 'true'
+        run: |
+          git push --follow-tags origin main
+          echo "✅ Pushed version bump and tags"
       
       - name: Create Release
-        if: steps.versionize.outcome == 'success'
+        if: steps.versionize.outputs.success == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.versionize.outputs.VERSION }}
           name: Release v${{ steps.versionize.outputs.VERSION }}
           body_path: CHANGELOG.md
           generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
