@@ -22,15 +22,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
       
       - name: Cache NuGet packages
-        uses: actions/cache@v5
+        uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -38,35 +38,33 @@ jobs:
             ${{ runner.os }}-nuget-
       
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore MyTuiApp.sln
       
       - name: Publish Native AOT
-        run: |
-          dotnet publish src/MyTuiApp/MyTuiApp.csproj \
-            -c Release \
-            -r ${{ matrix.runtime }} \
-            -o artifacts/${{ matrix.runtime }} \
-            -p:PublishAot=true \
-            -p:StripSymbols=true
+        run: dotnet publish src/MyTuiApp/MyTuiApp.csproj -c Release -r ${{ matrix.runtime }} -o artifacts/${{ matrix.runtime }} -p:PublishAot=true -p:StripSymbols=true
       
-      - name: Package binary
+      - name: Package binary (Windows)
+        if: matrix.os == 'windows-latest'
         run: |
           cd artifacts/${{ matrix.runtime }}
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            7z a ../../mytui-${{ matrix.runtime }}.zip *
-          else
-            tar czf ../../mytui-${{ matrix.runtime }}.tar.gz *
-          fi
+          7z a ../../mytui-${{ matrix.runtime }}.zip *
+        shell: bash
+      
+      - name: Package binary (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd artifacts/${{ matrix.runtime }}
+          tar czf ../../mytui-${{ matrix.runtime }}.tar.gz *
         shell: bash
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: mytui-${{ matrix.runtime }}
           path: mytui-${{ matrix.runtime }}.*
       
       - name: Upload to release
         if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
           files: mytui-${{ matrix.runtime }}.*
