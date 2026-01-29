@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  workflows: write  # Required to modify workflow files
 
 jobs:
   template-cleanup:
