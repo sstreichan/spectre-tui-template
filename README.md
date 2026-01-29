@@ -23,7 +23,25 @@ A modern C# TUI (Terminal User Interface) application template built with Spectr
 1. Click the **"Use this template"** button at the top of this repository
 2. Enter your new repository name (e.g., `my-awesome-app`)
 3. Create the repository
-4. **Activate auto-rename** (choose one method):
+4. **⚠️ IMPORTANT: Configure Workflow Permissions** (see below)
+5. **Activate auto-rename** (see methods below)
+
+### ⚙️ Required: Configure Workflow Permissions
+
+**Before the template can auto-rename**, you must enable workflow permissions in your new repository:
+
+1. Go to your repository's **Settings** tab
+2. Navigate to **Actions** → **General** (left sidebar)
+3. Scroll down to **"Workflow permissions"**
+4. Select: ✅ **"Read and write permissions"**
+5. Enable: ✅ **"Allow GitHub Actions to create and approve pull requests"**
+6. Click **"Save"**
+
+> **Why?** The template cleanup workflow needs permission to modify workflow files during the auto-rename process. This is a one-time setup.
+
+### Activate Auto-Rename
+
+After configuring permissions, choose one method:
 
 #### Method A: Make any commit (Recommended)
 ```bash
@@ -43,6 +61,7 @@ git push
 1. Go to your repository's **Actions** tab
 2. Click on **"Template Cleanup"** workflow
 3. Click **"Run workflow"** → **"Run workflow"**
+4. Wait ~30 seconds for completion
 
 ### What Happens Automatically
 
@@ -212,10 +231,18 @@ You can also **manually trigger** the release workflow:
 
 ### Template didn't auto-rename
 
-If the auto-rename didn't work:
-1. Check the **Actions** tab for workflow run status
+**Common Issue**: Permission denied error in workflow
+
+**Solution**:
+1. Go to **Settings** → **Actions** → **General**
+2. Under "Workflow permissions", select **"Read and write permissions"**
+3. Enable **"Allow GitHub Actions to create and approve pull requests"**
+4. **Save** and re-run the workflow
+
+If still not working:
+1. Check the **Actions** tab for workflow run status and error logs
 2. Manually trigger the "Template Cleanup" workflow
-3. Or make a small commit to trigger it
+3. Verify all permissions are correctly set
 
 ### Release workflow not creating tags
 
@@ -223,12 +250,25 @@ Make sure:
 - You're using conventional commit messages (`feat:`, `fix:`, etc.)
 - Commits are pushed to the `main` branch
 - You have at least one `feat:` or `fix:` commit since initialization
+- Workflow permissions are set to "Read and write"
 
 ### Build errors after renaming
 
 1. Clean and rebuild: `dotnet clean && dotnet build`
 2. Check that all references were updated correctly
 3. Verify `.csproj` and `.sln` files have correct project names
+
+### Workflow permission errors
+
+If you see errors like:
+```
+refusing to allow a GitHub App to create or update workflow without `workflows` permission
+```
+
+**Fix**:
+1. Settings → Actions → General
+2. Set "Workflow permissions" to "Read and write permissions"
+3. Save and retry
 
 ## Contributing
 
