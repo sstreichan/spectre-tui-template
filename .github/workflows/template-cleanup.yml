@@ -42,7 +42,7 @@ jobs:
           # PascalCase (MyNewApp)
           PASCAL_CASE=$(echo "$REPO_NAME" | sed -E 's/(^|-)([a-z])/\U\2/g' | sed 's/-//g')
           # lowercase (mynewapp)
-          LOWER_CASE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '')
+          LOWER_CASE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr -d '-')
           # snake_case (my_new_app)
           SNAKE_CASE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
           
