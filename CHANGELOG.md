@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 
+<a name="1.0.5"></a>
+## [1.0.5](https://www.github.com/sstreichan/spectre-tui-template/releases/tag/v1.0.5) (2026-01-29)
+
+### 🐛 Bug Fixes
+
+* use stable actions/checkout@v4 and setup-dotnet@v4 in release workflow ([bd26b60](https://www.github.com/sstreichan/spectre-tui-template/commit/bd26b60f254aa0d5fbfeaed3bd2c108ea51fe3a8))
+* use stable actions/checkout@v4 in template cleanup ([09ab532](https://www.github.com/sstreichan/spectre-tui-template/commit/09ab532b6c2a26ac57f11a4aeca385abac1b6a2f))
+
 <a name="1.0.4"></a>
 ## [1.0.4](https://www.github.com/sstreichan/spectre-tui-template/releases/tag/v1.0.4) (2026-01-29)
 
