@@ -34,7 +34,7 @@ jobs:
         id: versionize
         run: |
           # Run versionize and capture output
-          versionize --changelog-all || exit_code=$?
+          versionize --skip-dirty || exit_code=$?
           
           # Check if versionize succeeded (exit code 0 means version was bumped)
           if [ -z "$exit_code" ] || [ "$exit_code" -eq 0 ]; then
