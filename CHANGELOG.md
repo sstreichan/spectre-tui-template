@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 
+<a name="1.0.2"></a>
+## [1.0.2](https://www.github.com/sstreichan/spectre-tui-template/releases/tag/v1.0.2) (2026-01-29)
+
 <a name="1.0.1"></a>
 ## [1.0.1](https://www.github.com/sstreichan/spectre-tui-template/releases/tag/v1.0.1) (2026-01-29)
 
