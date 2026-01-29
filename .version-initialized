@@ -1,0 +1,7 @@
+# Version Initialization
+
+This file marks that the repository has been initialized with a version tag.
+Versionize will use this as the baseline for analyzing conventional commits.
+
+Initial version: 0.0.0
+Date: 2026-01-29
