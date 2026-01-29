@@ -1,141 +1,83 @@
-# Spectre.Console TUI Template
+# Spectre TUI Template
 
-[![Build and Publish](https://github.com/sstreichan/spectre-tui-template/actions/workflows/build-publish.yml/badge.svg)](https://github.com/sstreichan/spectre-tui-template/actions/workflows/build-publish.yml)
-[![Release](https://github.com/sstreichan/spectre-tui-template/actions/workflows/release.yml/badge.svg)](https://github.com/sstreichan/spectre-tui-template/actions/workflows/release.yml)
-
-A modern TUI (Terminal User Interface) application template using:
-
-- **Spectre.Console** - Beautiful console UI framework
-- **Native AOT** - Fast startup and small binaries
-- **Versionize** - Automated semantic versioning
-- **GitHub Actions** - Multi-platform builds (Linux, Windows, macOS including ARM64)
+A modern C# TUI (Terminal User Interface) application template built with Spectre.Console, featuring Native AOT compilation and automated versioning using Versionize.
 
 ## Features
 
-- ✨ Interactive terminal UI with Spectre.Console
-- 🚀 Native AOT compilation for maximum performance
-- 📦 Automated releases for multiple platforms
-- 🔄 Conventional commits with automatic versioning
-- 🎯 C# coding standards with .editorconfig
-- 🤖 Dependabot for automated dependency updates
+- 🚀 **Spectre.Console** for rich terminal UI
+- ⚡ **Native AOT** compilation for fast startup and small binaries
+- 📦 **Automated Versioning** with Versionize (Conventional Commits)
+- 🔄 **Automated Releases** via GitHub Actions
+- 🤖 **Dependabot** integration for dependency updates
 
-## Quick Start
+## Getting Started
 
 ### Prerequisites
 
 - .NET 8.0 SDK or later
 - Git
 
-### Build & Run
+### Building
 
 ```bash
-# Clone the repository
-git clone https://github.com/sstreichan/spectre-tui-template.git
-cd spectre-tui-template
-
 # Restore dependencies
 dotnet restore
 
+# Build the project
+dotnet build
+
 # Run the application
 dotnet run --project src/MyTuiApp
-
-# Try the hello command
-dotnet run --project src/MyTuiApp -- hello YourName
-dotnet run --project src/MyTuiApp -- hello YourName --fancy
 ```
 
-### Build Native AOT
+### Native AOT Build
 
 ```bash
-# Build for your platform
-dotnet publish src/MyTuiApp/MyTuiApp.csproj -c Release -r linux-x64
+# Build with Native AOT
+dotnet publish -c Release
 
-# Run the native binary
-./src/MyTuiApp/bin/Release/net8.0/linux-x64/publish/MyTuiApp
+# The output will be in: src/MyTuiApp/bin/Release/net8.0/[runtime]/publish/
 ```
 
-## Development
+## Versioning
 
-### Adding Commands
+This project uses [Versionize](https://github.com/versionize/versionize) for automated versioning based on Conventional Commits.
 
-1. Create a new command class in `src/MyTuiApp/Commands/`
-2. Inherit from `Command<TSettings>`
-3. Register in `Program.cs`
+### Commit Message Format
 
-Example:
-
-```csharp
-public class MyCommand : Command<MyCommand.Settings>
-{
-    public class Settings : CommandSettings
-    {
-        [CommandArgument(0, "<input>")]
-        public string Input { get; init; } = string.Empty;
-    }
-
-    public override int Execute(CommandContext context, Settings settings)
-    {
-        AnsiConsole.MarkupLine($"Processing: [green]{settings.Input}[/]");
-        return 0;
-    }
-}
-```
-
-### Commit Conventions
-
-Use [Conventional Commits](https://www.conventionalcommits.org/) for automatic versioning:
-
-- `feat:` - New features (bumps minor version)
-- `fix:` - Bug fixes (bumps patch version)
-- `perf:` - Performance improvements
+- `feat:` - New features (minor version bump)
+- `fix:` - Bug fixes (patch version bump)
 - `docs:` - Documentation changes
 - `refactor:` - Code refactoring
-- `BREAKING CHANGE:` - Breaking changes (bumps major version)
+- `perf:` - Performance improvements
+- `chore:` - Maintenance tasks
 
-Example:
-```bash
-git commit -m "feat: add interactive file selection menu"
-git commit -m "fix: resolve crash on empty input"
-```
+### Creating a Release
 
-## Automated Workflows
+Releases are automatically created when you push to `main` with conventional commits. The GitHub Actions workflow will:
 
-### Release Workflow
-
-On push to `main`:
-1. Versionize analyzes commits
-2. Updates version and CHANGELOG.md
-3. Creates git tag
-4. Creates GitHub release
-
-### Build Workflow
-
-On new release:
-1. Builds Native AOT binaries for:
-   - Linux (x64)
-   - Windows (x64)
-   - macOS (x64, ARM64)
-2. Uploads artifacts to release
+1. Analyze commits since the last release
+2. Update version numbers
+3. Generate CHANGELOG
+4. Create a Git tag
+5. Create a GitHub release
 
 ## Project Structure
 
 ```
-MyTuiApp/
-├── .github/
-│   ├── workflows/          # GitHub Actions
-│   └── dependabot.yml     # Dependency automation
+.
 ├── src/
-│   └── MyTuiApp/
-│       ├── Commands/       # CLI commands
-│       ├── Models/         # Data models
-│       ├── UI/            # UI components
-│       └── Program.cs
-├── .editorconfig          # Coding standards
-├── .versionize            # Versioning config
-├── Directory.Build.props  # MSBuild properties
+│   └── MyTuiApp/          # Main application project
+├── .github/
+│   └── workflows/         # GitHub Actions workflows
+├── .versionize           # Versionize configuration
 └── README.md
 ```
 
 ## License
 
-MIT
+This template is available as open source.
+
+## Contributing
+
+Contributions are welcome! Please use conventional commits for all pull requests.
