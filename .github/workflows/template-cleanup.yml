@@ -1,0 +1,136 @@
+name: Template Cleanup
+
+# This workflow runs once when a new repository is created from this template
+# It renames all occurrences of 'MyTuiApp' to the new repository name
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  template-cleanup:
+    # Only run if this is NOT the template repository itself
+    if: github.repository != 'sstreichan/spectre-tui-template'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract repository info
+        id: repo_info
+        run: |
+          # Extract repository name from github.repository (owner/repo)
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          REPO_OWNER=$(echo "${{ github.repository }}" | cut -d'/' -f1)
+          
+          echo "Repository Name: $REPO_NAME"
+          echo "Repository Owner: $REPO_OWNER"
+          
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+          echo "repo_owner=$REPO_OWNER" >> $GITHUB_OUTPUT
+          
+          # Convert to different naming conventions
+          # PascalCase (MyNewApp)
+          PASCAL_CASE=$(echo "$REPO_NAME" | sed -E 's/(^|-)([a-z])/\U\2/g' | sed 's/-//g')
+          # lowercase (mynewapp)
+          LOWER_CASE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '')
+          # snake_case (my_new_app)
+          SNAKE_CASE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
+          
+          echo "pascal_case=$PASCAL_CASE" >> $GITHUB_OUTPUT
+          echo "lower_case=$LOWER_CASE" >> $GITHUB_OUTPUT
+          echo "snake_case=$SNAKE_CASE" >> $GITHUB_OUTPUT
+      
+      - name: Rename files and directories
+        run: |
+          # Find and rename all directories containing 'MyTuiApp'
+          find . -depth -type d -name "*MyTuiApp*" | while read dir; do
+            new_dir=$(echo "$dir" | sed "s/MyTuiApp/${{ steps.repo_info.outputs.pascal_case }}/g")
+            if [ "$dir" != "$new_dir" ]; then
+              echo "Renaming directory: $dir -> $new_dir"
+              mv "$dir" "$new_dir"
+            fi
+          done
+          
+          # Find and rename all files containing 'MyTuiApp'
+          find . -type f -name "*MyTuiApp*" | while read file; do
+            new_file=$(echo "$file" | sed "s/MyTuiApp/${{ steps.repo_info.outputs.pascal_case }}/g")
+            if [ "$file" != "$new_file" ]; then
+              echo "Renaming file: $file -> $new_file"
+              mv "$file" "$new_file"
+            fi
+          done
+      
+      - name: Replace content in files
+        run: |
+          # Replace content in all files (excluding .git and binary files)
+          echo "Replacing 'MyTuiApp' with '${{ steps.repo_info.outputs.pascal_case }}' in all files..."
+          
+          find . -type f \( \
+            -name "*.cs" -o \
+            -name "*.csproj" -o \
+            -name "*.sln" -o \
+            -name "*.yml" -o \
+            -name "*.yaml" -o \
+            -name "*.json" -o \
+            -name "*.md" -o \
+            -name "*.xml" -o \
+            -name "*.props" -o \
+            -name "*.targets" \
+          \) -not -path "*/.git/*" | while read file; do
+            # Replace various naming conventions
+            sed -i "s/MyTuiApp/${{ steps.repo_info.outputs.pascal_case }}/g" "$file"
+            sed -i "s/mytuiapp/${{ steps.repo_info.outputs.lower_case }}/g" "$file"
+            sed -i "s/my-tui-app/${{ steps.repo_info.outputs.repo_name }}/g" "$file"
+            
+            echo "Updated: $file"
+          done
+          
+          echo "✅ Content replacement complete!"
+      
+      - name: Update README badges
+        run: |
+          # Update README with correct repository owner and name
+          if [ -f "README.md" ]; then
+            sed -i "s/sstreichan\/spectre-tui-template/${{ steps.repo_info.outputs.repo_owner }}\/${{ steps.repo_info.outputs.repo_name }}/g" README.md
+            echo "✅ README badges updated"
+          fi
+      
+      - name: Remove template cleanup workflow
+        run: |
+          # Remove this workflow file as it's no longer needed
+          rm -f .github/workflows/template-cleanup.yml
+          echo "✅ Template cleanup workflow removed"
+      
+      - name: Commit changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git add .
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: rename project from template to ${{ steps.repo_info.outputs.pascal_case }}
+            
+            ✨ Template successfully customized!
+            
+            - Renamed all files and directories
+            - Updated all file contents
+            - Removed template cleanup workflow
+            
+            Your project is ready to use! 🚀"
+            
+            git push
+            echo "✅ Changes pushed successfully"
+          fi
