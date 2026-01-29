@@ -1,0 +1,72 @@
+name: Build and Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            runtime: linux-x64
+          - os: windows-latest
+            runtime: win-x64
+          - os: macos-latest
+            runtime: osx-x64
+          - os: macos-latest
+            runtime: osx-arm64
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Publish Native AOT
+        run: |
+          dotnet publish src/MyTuiApp/MyTuiApp.csproj \
+            -c Release \
+            -r ${{ matrix.runtime }} \
+            -o artifacts/${{ matrix.runtime }} \
+            -p:PublishAot=true \
+            -p:StripSymbols=true
+      
+      - name: Package binary
+        run: |
+          cd artifacts/${{ matrix.runtime }}
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            7z a ../../mytui-${{ matrix.runtime }}.zip *
+          else
+            tar czf ../../mytui-${{ matrix.runtime }}.tar.gz *
+          fi
+        shell: bash
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mytui-${{ matrix.runtime }}
+          path: mytui-${{ matrix.runtime }}.*
+      
+      - name: Upload to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: mytui-${{ matrix.runtime }}.*
