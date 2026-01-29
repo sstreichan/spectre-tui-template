@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 
+<a name="1.0.1"></a>
+## [1.0.1](https://www.github.com/sstreichan/spectre-tui-template/releases/tag/v1.0.1) (2026-01-29)
+
+### 🐛 Bug Fixes
+
+* correct tr command for repo names without hyphens ([ac3c788](https://www.github.com/sstreichan/spectre-tui-template/commit/ac3c788407ddd82c507bae395308f476c39f46e3))
+
 <a name="1.0.0"></a>
 ## [1.0.0](https://www.github.com/sstreichan/spectre-tui-template/releases/tag/v1.0.0) (2026-01-29)
 
