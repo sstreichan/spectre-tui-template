@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 
+<a name="1.0.4"></a>
+## [1.0.4](https://www.github.com/sstreichan/spectre-tui-template/releases/tag/v1.0.4) (2026-01-29)
+
+### 🐛 Bug Fixes
+
+* add workflows permission to template cleanup ([e821a90](https://www.github.com/sstreichan/spectre-tui-template/commit/e821a9032b1bd7f22035369741e4b3c4653ae340))
+
 <a name="1.0.3"></a>
 ## [1.0.3](https://www.github.com/sstreichan/spectre-tui-template/releases/tag/v1.0.3) (2026-01-29)
 
