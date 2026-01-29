@@ -23,18 +23,40 @@ A modern C# TUI (Terminal User Interface) application template built with Spectr
 1. Click the **"Use this template"** button at the top of this repository
 2. Enter your new repository name (e.g., `my-awesome-app`)
 3. Create the repository
-4. **That's it!** 🎉 
+4. **Activate auto-rename** (choose one method):
 
-The template will automatically:
+#### Method A: Make any commit (Recommended)
+```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
+
+# Make any small change
+echo "# My Project" >> README.md
+git add README.md
+git commit -m "docs: update readme"
+git push
+
+# ✨ The template cleanup will run automatically!
+```
+
+#### Method B: Manual trigger via GitHub UI
+1. Go to your repository's **Actions** tab
+2. Click on **"Template Cleanup"** workflow
+3. Click **"Run workflow"** → **"Run workflow"**
+
+### What Happens Automatically
+
+Once triggered, the template will:
 - ✅ Rename all `MyTuiApp` occurrences to your repository name
 - ✅ Update all file names and directory names
 - ✅ Update solution and project files
 - ✅ Update README badges with your repository info
-- ✅ Remove the template cleanup workflow
+- ✅ Remove the template cleanup workflow itself
+- ✅ Create a commit: `chore: rename project from template to YourProjectName`
 
-### What Gets Renamed
+### Naming Conventions
 
-If you name your repository `my-cool-app`, the template will create:
+If you name your repository `my-cool-app`, the template creates:
 
 | Convention | Example | Used In |
 |------------|---------|----------|
@@ -70,10 +92,10 @@ dotnet run --project src/YOUR_PROJECT_NAME
 ### Native AOT Build
 
 ```bash
-# Build with Native AOT
+# Build with Native AOT for your platform
 dotnet publish -c Release
 
-# The output will be in: src/YOUR_PROJECT_NAME/bin/Release/net8.0/[runtime]/publish/
+# Output location: src/YOUR_PROJECT_NAME/bin/Release/net8.0/[runtime]/publish/
 ```
 
 ## Development
@@ -90,12 +112,13 @@ dotnet publish -c Release
 .
 ├── src/
 │   └── MyTuiApp/              # Main application project
-│       ├── MyTuiApp.csproj     # Project file
-│       └── Program.cs          # Application entry point
+│       ├── Commands/          # CLI commands
+│       ├── MyTuiApp.csproj    # Project file
+│       └── Program.cs         # Application entry point
 ├── .github/
 │   └── workflows/             # GitHub Actions workflows
 │       ├── release.yml        # Automated release workflow
-│       ├── build.yml          # CI build workflow
+│       ├── build-publish.yml  # CI build workflow
 │       └── template-cleanup.yml # Template renaming (auto-removes)
 ├── .versionize               # Versionize configuration
 ├── Directory.Build.props     # Shared MSBuild properties
@@ -139,33 +162,73 @@ BREAKING CHANGE: Configuration now uses fluent API instead of JSON"
 
 ### Creating a Release
 
-Releases are **automatically created** when you push to `main` with conventional commits:
+Releases are **automatically created** when you push commits with conventional commit messages to `main`:
 
-1. Push commits to `main`
-2. GitHub Actions runs the release workflow
-3. Versionize analyzes commits and bumps version
-4. CHANGELOG is updated
-5. Git tag is created (e.g., `v1.2.0`)
-6. GitHub release is published
+1. Make commits using conventional commit format
+2. Push to `main` branch
+3. GitHub Actions runs the release workflow
+4. Versionize analyzes commits and bumps version
+5. CHANGELOG is updated
+6. Git tag is created (e.g., `v1.2.0`)
+7. GitHub release is published with binaries
 
-You can also **manually trigger** the release workflow from the Actions tab.
+You can also **manually trigger** the release workflow:
+1. Go to **Actions** tab
+2. Select **"Release"** workflow
+3. Click **"Run workflow"**
 
 ## CI/CD Workflows
 
 ### Release Workflow
-- **Trigger**: Push to `main` or manual dispatch
-- **Actions**: Version bump, changelog generation, GitHub release creation
 - **File**: `.github/workflows/release.yml`
+- **Trigger**: Push to `main` with conventional commits, or manual dispatch
+- **Actions**: 
+  - Analyzes commits since last release
+  - Bumps version in project files
+  - Generates CHANGELOG
+  - Creates Git tag
+  - Publishes GitHub release
 
-### Build Workflow
+### Build & Publish Workflow
+- **File**: `.github/workflows/build-publish.yml`
 - **Trigger**: Push and Pull Requests
-- **Actions**: Build verification, test execution, artifact creation
-- **File**: `.github/workflows/build.yml`
+- **Actions**: 
+  - Builds project for all platforms
+  - Runs tests
+  - Creates artifacts
+  - Attaches binaries to releases
 
 ### Template Cleanup Workflow
-- **Trigger**: First push to a new repository from template
-- **Actions**: Renames all project files and removes itself
-- **File**: `.github/workflows/template-cleanup.yml` (auto-removes)
+- **File**: `.github/workflows/template-cleanup.yml`
+- **Trigger**: First push to a new repository from template, or manual dispatch
+- **Actions**: 
+  - Detects repository name
+  - Renames all project files and directories
+  - Updates file contents
+  - Removes itself
+- **Note**: This workflow auto-removes after first successful run
+
+## Troubleshooting
+
+### Template didn't auto-rename
+
+If the auto-rename didn't work:
+1. Check the **Actions** tab for workflow run status
+2. Manually trigger the "Template Cleanup" workflow
+3. Or make a small commit to trigger it
+
+### Release workflow not creating tags
+
+Make sure:
+- You're using conventional commit messages (`feat:`, `fix:`, etc.)
+- Commits are pushed to the `main` branch
+- You have at least one `feat:` or `fix:` commit since initialization
+
+### Build errors after renaming
+
+1. Clean and rebuild: `dotnet clean && dotnet build`
+2. Check that all references were updated correctly
+3. Verify `.csproj` and `.sln` files have correct project names
 
 ## Contributing
 
