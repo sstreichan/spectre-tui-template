@@ -14,23 +14,19 @@ jobs:
             runtime: linux-x64
           - os: windows-latest
             runtime: win-x64
-          - os: macos-latest
-            runtime: osx-x64
-          - os: macos-latest
-            runtime: osx-arm64
     
     runs-on: ${{ matrix.os }}
     
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '8.0.x'
       
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -50,7 +46,7 @@ jobs:
           7z a ../../mytui-${{ matrix.runtime }}.zip *
         shell: bash
       
-      - name: Package binary (Linux/macOS)
+      - name: Package binary (Linux)
         if: matrix.os != 'windows-latest'
         run: |
           cd artifacts/${{ matrix.runtime }}
@@ -58,13 +54,13 @@ jobs:
         shell: bash
       
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: mytui-${{ matrix.runtime }}
           path: mytui-${{ matrix.runtime }}.*
       
       - name: Upload to release
         if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: mytui-${{ matrix.runtime }}.*
